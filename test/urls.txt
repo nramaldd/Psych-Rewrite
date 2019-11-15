@@ -1,2 +1,1 @@
-https://github.com/SomethingGeneric/Pynix 
-https://github.com/SomethingGeneric/DRM-Free 
+https://github.com/Pynix 

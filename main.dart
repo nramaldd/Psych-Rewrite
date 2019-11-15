@@ -3,6 +3,8 @@ import 'dart:io';
 import 'dart:async';
 import 'dart:core';
 
+String os = Platform.operatingSystem;
+
 String argAt(theargs,i) {
   if (theargs.length > i) {
     return theargs[i];
@@ -12,7 +14,11 @@ String argAt(theargs,i) {
 }
 
 void lazySave(name,text) {
-  Process.run("cmd",["/C","echo",text,">>",name]);
+  if (os == "windows") {
+      Process.run("cmd",["/C","echo",text,">>",name]);
+  } else {
+      Process.run("echo",[text,">>",name]);
+  }
 }
 
 Future<String> getF(filename) async {
@@ -110,7 +116,7 @@ void main(List<String> args) async {
     } else if (command == "help" || command == "--help" || command == "/?") {
         print("Commands:");
         print("- newproject <name> : creates a new Psych project. Will prompt you for the git URLS to clone from.");
-        print("- download <name> : Downloads (clones) all repos that are a part of project <name");
+        print("- download <name> : Downloads (clones) all repos that are a part of project <name>");
         print("- send <name> <message> : Pushes all local changes in each repo within <name>, using commit message <message>");
         print("- sync <name> : Pulls all remote changes for each repo in <name>");
     } else {
