@@ -1,3 +1,9 @@
+# Atom
+.atom/*
+
+# Builds
+*.exe
+
 # See https://www.dartlang.org/guides/libraries/private-files
 
 # Files and directories created by pub

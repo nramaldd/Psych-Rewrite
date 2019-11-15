@@ -1,0 +1,6 @@
+name: Psych
+description: A sample command-line application.
+version: 0.0.1
+
+environment:
+  sdk: '>2.0.0'
