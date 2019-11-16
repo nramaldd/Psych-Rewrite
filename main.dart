@@ -9,7 +9,7 @@ String argAt(theargs,i) {
   if (theargs.length > i) {
     return theargs[i];
   } else {
-    return "Fail";
+    return null;
   }
 }
 
@@ -51,66 +51,81 @@ void main(List<String> args) async {
     var command = argAt(args,0);
     if (command == "newproject" || command == "-n" || command == "-np" || command == "--n" || command == "--np") {
       var name = argAt(args,1);
-      new Directory(name).create();
-      print("Made a folder for $name");
-      Directory.current = name;
-      print("Now we're going to add URLS.\nEnter blank to end");
-      bool stop = false;
-      while (!stop) {
-        print("URL: ");
-        var input = stdin.readLineSync();
-        if (input != "") {
-          lazySave("urls.txt",input);
-        } else {
-          stop = true;
+      if (name != null) {
+        new Directory(name).create();
+        print("Made a folder for $name");
+        Directory.current = name;
+        print("Now we're going to add URLS.\nEnter blank to end");
+        bool stop = false;
+        while (!stop) {
+          print("URL: ");
+          var input = stdin.readLineSync();
+          if (input != "") {
+            lazySave("urls.txt",input);
+          } else {
+            stop = true;
+          }
         }
+        print("Done.");
+      } else {
+        print("Missing arguement: name\nQuitting.");
       }
-      print("Done.");
     } else if (command == "download" || command == "-d" || command =="--d") {
-      print("Downloading could take time if the repos are large.");
-      print("Please be patient, even if it looks like the operation has locked up.");
       var name = argAt(args,1);
-      Directory.current = name;
-      List urls = await getlinks(name);
-      for (var url in urls) {
-        if (url != "" && url != " ") {
-          print("Starting $url");
-          await clone(url);
-          print("Finished $url");
+      if (name != null) {
+        print("Downloading could take time if the repos are large.");
+        print("Please be patient, even if it looks like the operation has locked up.");
+        Directory.current = name;
+        List urls = await getlinks(name);
+        for (var url in urls) {
+          if (url != "" && url != " ") {
+            print("Starting $url");
+            await clone(url);
+            print("Finished $url");
+          }
         }
+      } else {
+        print("No arguement: name");
+        print("Quitting.");
       }
     } else if (command == "send" || command == "-send" || command == "--send") {
       var name = argAt(args,1);
       var msg = argAt(args,2);
-      print("Commit msg: $msg");
-      Directory.current = name;
-      var save = Directory.current;
-      List contents = Directory.current.listSync();
-      for (var thing in contents) {
-        if (thing is Directory) {
-          Directory.current = thing;
-          print("Pushing changes to $thing");
-          await gitop(["add","*"]);
-          await gitop(["commit","-m",'"' + msg + '"']);
-          int stat = await gitop(["push"]);
-          if (stat == 0) {
-            print("Push probably failed. This is either because you didn't change anything, or you're behind remote. Try to pull first?");
+      if (name != null && msg != null) {
+        print("Commit msg: $msg");
+        Directory.current = name;
+        var save = Directory.current;
+        List contents = Directory.current.listSync();
+        for (var thing in contents) {
+          if (thing is Directory) {
+            Directory.current = thing;
+            print("Pushing changes to $thing");
+            await gitop(["add","*"]);
+            await gitop(["commit","-m",'"' + msg + '"']);
+            int stat = await gitop(["push"]);
+            if (stat == 0) {
+              print("Push probably failed. This is either because you didn't change anything, or you're behind remote. Try to pull first?");
+            }
+            Directory.current = save;
           }
-          Directory.current = save;
         }
+      } else {
+        print("Missing either arguement for project name, or commit message.\nQuitting.");
       }
     }
     else if (command == "sync" || command == "-sync" || command == "--sync") {
       var name = argAt(args,1);
-      Directory.current = name;
-      var save = Directory.current;
-      List contents = Directory.current.listSync();
-      for (var thing in contents) {
-        if (thing is Directory) {
-          print("Pulling for $thing");
-          Directory.current = thing;
-          await gitop(["pull"]);
-          Directory.current = save;
+      if (name != null) {
+        Directory.current = name;
+        var save = Directory.current;
+        List contents = Directory.current.listSync();
+        for (var thing in contents) {
+          if (thing is Directory) {
+            print("Pulling for $thing");
+            Directory.current = thing;
+            await gitop(["pull"]);
+            Directory.current = save;
+          }
         }
       }
     } else if (command == "help" || command == "--help" || command == "/?") {
