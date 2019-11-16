@@ -5,7 +5,7 @@ test/*
 .atom/*
 
 # Builds
-#*.exe
+*.exe
 
 # See https://www.dartlang.org/guides/libraries/private-files
 
